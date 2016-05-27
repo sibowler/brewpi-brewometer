@@ -1,5 +1,6 @@
 # Brewometer polling library
 # Simon Bowler 21/04/2016
+# simon@bowler.id.au
 
 import blescan
 import sys
@@ -19,7 +20,7 @@ class BrewometerValue:
 		self.gravity = gravity
 		
 	def __str__(self):
-		return "T: " + str(round(self.temperature,2)) + " G: " + self.gravity
+		return "T: " + str(round(self.temperature,2)) + " G: " + str(round(self.gravity,3))
 		 
 class Brewometer:
 	colour = ''
@@ -72,6 +73,9 @@ class BrewometerManager:
 	def convertFtoC(self, temperatureF):
 		return (int(temperatureF) - 32) * 5.0 / 9
 	
+	def convertSG(self, gravity):
+		return float(gravity)/ 1000
+    
 	#Store function
 	def storeValue(self, colour, temperature, gravity):
 		#print 'Adding Value: ' + colour + ":" + temperature + ":" + gravity
@@ -117,7 +121,7 @@ class BrewometerManager:
 					temperature = beaconParts[2]
 					if not self.inFarenheight:
 						temperature = self.convertFtoC(temperature)
-					gravity = beaconParts[3]
+					gravity = self.convertSG(beaconParts[3])
 					self.storeValue(name, temperature, gravity)
 
 	#Stop Scanning function

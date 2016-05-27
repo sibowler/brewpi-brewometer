@@ -303,14 +303,16 @@ function formatForChartLegend(v) {
     "use strict";
     var val = parseFloat(v);
     if ( !isNaN(val) ) {
-        if (val > 800) //Assume value is gravity
-        {
-            return val.toFixed(0);
-        }
-        else
-        {
-            return val.toFixed(2) + "\u00B0" + window.tempFormat;
-        }
+        return val.toFixed(2) + "\u00B0" + window.tempFormat;
+    }
+    return "--";
+}
+function formatForChartLegendSG(v) {
+    "use strict";
+    var val = parseFloat(v);
+    if ( !isNaN(val) ) {
+        return val.toFixed(3);
+        
     }
     return "--";
 }
@@ -324,21 +326,21 @@ function showChartLegend(e, x, pts, row, g) {
     $('#curr-beer-chart-legend .beer-chart-legend-row.fridgeSet .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 4)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.roomTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 5)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.redTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 7)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.redSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 8)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.redSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 8)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.greenTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 9)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.greenSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 10)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.greenSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 10)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.blackTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 11)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.blackSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 12)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.blackSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 12)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.purpleTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 13)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.purpleSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 14)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.purpleSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 14)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.orangeTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 15)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.orangeSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 16)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.orangeSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 16)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.blueTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 17)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.blueSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 18)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.blueSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 18)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.yellowTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 19)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.yellowSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 20)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.yellowSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 20)) );
     $('#curr-beer-chart-legend .beer-chart-legend-row.pinkTemp .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 21)) );
-    $('#curr-beer-chart-legend .beer-chart-legend-row.pinkSG .beer-chart-legend-value').text( formatForChartLegend(currentDataSet.getValue(row, 22)) );
+    $('#curr-beer-chart-legend .beer-chart-legend-row.pinkSG .beer-chart-legend-value').text( formatForChartLegendSG(currentDataSet.getValue(row, 22)) );
     var state = parseInt(currentDataSet.getValue(row, STATE_COLUMN));
     if ( !isNaN(state) ) {
         $('#curr-beer-chart-legend .beer-chart-legend-row.state .beer-chart-legend-label').text(STATES[state].text);
@@ -404,7 +406,7 @@ function drawBeerChart(beerToDraw, div){
         };
         
         var gravityFormat = function(y) {
-            return parseFloat(y).toFixed(0);
+            return parseFloat(y).toFixed(3);
         };
         var beerChart = new Dygraph(document.getElementById(div),
                 beerData.values, {
