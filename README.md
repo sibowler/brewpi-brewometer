@@ -1,6 +1,6 @@
 These brewpi and other files have been modified to support the brewometer.
 
-Setup:
+#Setup & Testing
 
 On the raspberry pi you need to install the bluez bnd python-bluez luetooth modules to enable communication with the Brewometer.
 
@@ -15,6 +15,8 @@ Test that you've now enabled a connection by running the utility in the brewomet
 	python BrewometerTest.py
 
 If you see values against your colour brewometer, then the connection has been successful.
+
+# Modifying Brewpi for Brewometer logging
 
 The files in the `brewpi-web` folder should be copied to the `/var/www` directory.
 
