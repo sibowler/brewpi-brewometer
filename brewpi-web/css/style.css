@@ -1,0 +1,800 @@
+@import url('dygraph.css');
+
+@font-face {
+    font-family: 'CPMono_v07_Plain', monospace;
+    src: url('../font/CPMono_v07_Plain.otf') format('opentype');
+}
+
+body {
+	background: #fff;
+	color: #000;
+	font-family: Verdana, Arial, sans-serif;
+	width:980px;
+    font-size: 12px;
+}
+
+#top-bar button.script-status{
+	margin:10px;
+}
+
+button.script-status{
+	width: 200px;
+    float: right;
+	clear: right;
+    min-height: 25px;
+}
+
+button#maintenance{
+	width: 200px;
+    float: right;
+	clear:right;
+    min-height: 25px;
+	margin: 10px 10px 10px 10px;
+}
+
+/* Control Panel */
+.google-visualization-table-td{
+	text-align: center !important;
+}
+
+#controls{
+	position:relative;
+	left: 0;
+	top: 0;
+	float: left;
+	margin: 0 10px 0 0;
+}
+
+#controls button{
+	width: 96px;
+	display: block;
+	text-align: left;
+}
+
+
+#status-message{
+	width: 400px;
+	padding: 0.5em 0.8em;
+	float: right;
+}
+
+#status-message p{
+	margin: 0;
+}
+
+
+#control-bar-text{
+	margin: 0 2px;
+	width: 100%;
+	height: 18px;
+	display: block;
+	clear: both;
+}
+
+#status-text{
+	float: right;
+	width: 420px;
+}
+
+#set-mode-text{
+	margin-left: 2px;
+	float: left;
+}
+
+/* Brewometer change: Beer panel height to account for additional legend items */
+#beer-panel{
+	width: 980px;
+    height: 540px;
+	margin-bottom: 10px;
+    float:left;
+}
+
+#top-bar{
+	width: 968px;
+	margin: 5px;
+    float:left;
+}
+
+#control-panel{
+	width: 976px;
+    min-height: 390px;
+    float: left;
+}
+
+.temperature {
+	font-family: 'CPMono_v07_Plain', monospace !important;
+	font-size: 5em !important;
+	border: 0;
+	float: left;
+	margin-left: 10px;
+	width: 175px;
+}
+.temp-container{
+	width: 175px;
+}
+
+.temperature-controls {
+	float: right;
+}
+.degree{
+	font-family: 'CPMono_v07_Plain', monospace;
+	font-size: 2em;
+	float: right;
+	clear: right;
+	margin-right: 5px;
+}
+
+.temp-display{
+	border: #555 solid 2px;
+	overflow:auto;
+	width:240px;
+	margin-left: 330px;
+	margin-top: 40px;
+}
+
+.temp-up{
+	float: right;
+	clear: right;
+	margin: 5px;
+}
+.temp-down{
+	float: right;
+	clear: right;
+	margin: 5px;
+}
+
+/* LCD display styling */
+@font-face {
+    font-family: '5x8LCDHD44780UA02Regular';
+    src: url('../font/5x8_lcd_hd44780u_a02-webfont.eot');
+    src: url('../font/5x8_lcd_hd44780u_a02-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/5x8_lcd_hd44780u_a02-webfont.woff') format('woff'),
+         url('../font/5x8_lcd_hd44780u_a02-webfont.ttf') format('truetype'),
+         url('../font/5x8_lcd_hd44780u_a02-webfont.svg#5x8LCDHD44780UA02Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+.lcddisplay {
+	width: 280px;
+	height: 90px;
+	float: left;
+	margin: 5px;
+	background: #000000; /* Old browsers */
+	background: -moz-linear-gradient(top, #000000 2%, #2b2b2b 11%, #212121 54%, #212121 92%, #000000 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(2%,#000000), color-stop(11%,#2b2b2b), color-stop(54%,#212121), color-stop(92%,#212121), color-stop(100%,#000000)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #000000 2%,#2b2b2b 11%,#212121 54%,#212121 92%,#000000 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #000000 2%,#2b2b2b 11%,#212121 54%,#212121 92%,#000000 100%); /* Opera11.10+ */
+	background: -ms-linear-gradient(top, #000000 2%,#2b2b2b 11%,#212121 54%,#212121 92%,#000000 100%); /* IE10+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+	background: linear-gradient(top, #000000 2%,#2b2b2b 11%,#212121 54%,#212121 92%,#000000 100%); /* W3C */
+	-webkit-box-shadow: inset 1px 1px 5px #333333;
+	-moz-box-shadow: inset 1px 1px 5px #333333;
+	box-shadow: inset 1px 1px 5px #333333;
+	border: 2px solid #333;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+}
+
+.lcddisplay .lcd-text{
+	float:left;
+	margin: 5px 16px;
+}
+
+.lcd-line{
+	float:left;
+	clear:left;
+	font-size: 16px;
+	font-weight: normal;
+	font-style: normal;
+	font-family: '5x8LCDHD44780UA02Regular', monospace;
+	color: #FFFF00;
+	white-space: pre;
+}
+
+.ui-dialog,
+.ui-dialog .ui-dialog-content{
+    overflow: visible !important;
+}
+
+#maintenance-panel{
+    height: 700px!important;
+}
+
+#maintenance-panel ul.ui-tabs-nav li{
+    margin: 2px;
+    width: 180px;
+    text-align: center;
+}
+
+#maintenance-panel ul.ui-tabs-nav li a{
+    width: inherit;
+    padding-left: 0;
+}
+
+#maintenance-panel ul.ui-tabs-nav li:nth-child(6n) {
+    clear: left;
+}
+
+.console-box{
+    background: black;
+    color:#bbbbbb;
+    border: ridge 5px #ADD6FF;
+    padding: 10px 10px;
+    overflow: auto;
+    font-family: "Courrier New", monospace;
+    float: left;
+    width: 98%;
+}
+
+#maintenance-panel ui-widget-content .ui-corner-all{
+    padding: 5px 0;
+    float:left;
+    width: 98%;
+}
+
+#view-logs .console-box{
+    height: 240px;
+}
+
+#view-logs h3{
+    margin: 10px 40px;
+}
+
+#view-logs button{
+    float: right;
+}
+#view-logs button:first-child{
+    margin-right: 40px;
+}
+
+#reprogram-arduino p{
+    padding: 0 10px;
+}
+
+#program-container{
+    padding: 0 40px;
+    float: left;
+}
+
+#reprogram-arduino #program-options{
+    float: left;
+}
+
+#reprogram-arduino .program-option{
+    margin: 20px 0;
+}
+
+#reprogram-arduino .program-option label{
+    width: 350px;
+    float: left;
+}
+
+
+#reprogram-arduino .console-box{
+    height: 280px;
+}
+
+#reprogram-arduino h3{
+    float: left;
+    clear: both;
+}
+
+#reprogram-arduino #program-submit-button{
+    float:right;
+    margin: 20px 60px;
+}
+
+#device-config .console-box{
+    height: 100px;
+    width:97%;
+    float:none;
+}
+
+
+#maintenance-panel .device-list-container{
+    width: 99%;
+    margin: auto;
+    height: 400px;
+    overflow: auto;
+}
+#maintenance-panel .ui-widget-content .ui-widget-header{
+    margin: 5px 0;
+}
+#maintenance-panel .device-list-container .header button{
+    float: right;
+}
+
+#maintenance-panel .device-list-container .spinner-position{
+    position:absolute;
+    top:350px;
+    left:50%;
+}
+
+#maintenance-panel .device-list span.device-list-header{
+    display: block;
+    float: left;
+    clear: both;
+    margin: 10px 40px;
+    font-size: 1.5em;
+}
+
+#maintenance-panel .device-list span.device-list-empty-text{
+    display: block;
+    float: left;
+    clear: both;
+    margin: 10px 40px;
+}
+
+#maintenance-panel .device-list span.setting-name{
+    display: block;
+    float: left;
+    font-weight: bold;
+}
+
+#maintenance-panel .device-list .device-setting{
+    display: block;
+    float: left;
+    clear: left;
+}
+
+#maintenance-panel .device-list span.device-name{
+    display: block;
+    float: left;
+    clear: both;
+    font-size: 1.2em;
+    color: #306fa9;
+}
+
+#maintenance-panel .refresh-options-container{
+    float: right;
+    padding: 5px;
+}
+
+#maintenance-panel .device-container{
+    margin: 10px 40px;
+    padding: 5px 10px;
+    border: solid 1px;
+    float: left;
+}
+
+
+#maintenance-panel .device-name-and-apply{
+    float: left;
+    margin: 10px 20px;
+}
+
+#maintenance-panel .device-name{
+    float: left;
+}
+
+#maintenance-panel .device-list button.apply{
+    float: left;
+    clear: left;
+    margin-top: 15px;
+}
+
+#maintenance-panel .device-all-settings{
+    float: left;
+    color: #555;
+}
+
+#maintenance-panel .ui-widget-content {
+    font-family: Verdana, Arial, sans-serif;
+}
+
+#maintenance-panel .device-container .device-setting-container{
+    width: 150px;
+    padding: 5px;
+    float: left;
+}
+
+.device-container .device-setting-container:nth-child(4n+2){
+    clear: left;
+}
+
+.device-list-container button.add-new-device{
+    margin: 10px 40px;
+    float: left;
+    clear: left;
+}
+
+#advanced-settings{
+    height: auto;
+}
+
+#control-settings-container,
+#control-constants-container{
+    height: 250px;
+    overflow:auto;
+    padding: 5px;
+}
+
+
+#maintenance-panel #beer-selector{
+	margin-bottom: 20px;
+}
+
+#profile-control #controls button{
+	margin-bottom: 5px;
+}
+
+#maintenance-panel .setting-container{
+    float: left;
+    clear: both;
+	margin: 20px 15px;
+    width: 90%;
+
+}
+
+#maintenance-panel .setting-container .setting-name{
+	float: left;
+	clear: none;
+	font-weight: bold;
+	margin-top: 5px;
+	width: 320px;
+}
+
+#maintenance-panel .section-explanation{
+	float: left;
+	clear: both;
+    margin: 20px 15px;
+	width: 710px;
+}
+
+#maintenance-panel .setting-container .explanation{
+    float:left;
+    clear: left;
+	width: 320px;
+}
+
+#maintenance-panel .apply-button,
+#advanced-settings .send-button{
+    position: relative;
+    float: right;
+}
+
+#advanced-settings .reset-controller-button{
+	text-align: center;
+}
+
+#advanced-settings .setting-container select,
+#advanced-settings .setting-container input,
+#settings .setting-container select,
+#settings .setting-container input{
+    position: relative;
+	float: left;
+    left: 100px;
+}
+
+#maintenance-panel .container-title{
+    float: left;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+#maintenance-panel .header button{
+	float: right;
+}
+
+.algorithm-container{
+	margin-bottom: 10px;
+}
+
+.equation{
+	margin: 15px;
+	height: 4em;
+	clear: left;
+}
+
+.equation .cv,
+.equation .cs,
+.equation .cc{
+	float: left;
+}
+
+.on-off-parameters .cv,
+.on-off-parameters .cs,
+.on-off-parameters .cc{
+	float: left;
+	margin: 15px;
+}
+
+.on-off-parameters .negPeak{
+	clear: left;
+}
+.on-off-parameters .posPeak{
+	clear: left;
+}
+.on-off-parameters .coolEst{
+	clear: left;
+}
+
+
+#control-algorithm .name{
+	float: left;
+	border: solid 1px;
+	text-align: center;
+	font-weight: bold;
+}
+
+#control-algorithm .val{
+	float: left;
+	clear: left;
+	border: solid 1px #aaaaaa;
+	border-top: 0;
+	text-align: center;
+	font-size: 2em;
+	min-height: 1.2em;
+	font-weight: bold;
+}
+
+#control-algorithm .cc .name{
+	border-color: #aaaaaa;
+	background-color: #8CCCEC;
+}
+#control-algorithm .cv .name{
+	border-color: #aaaaaa;
+	background-color: #FFA039;
+}
+#control-algorithm .cs .name{
+	border-color: #aaaaaa;
+	background-color: #FFAAAA;
+}
+
+.equation .name,
+.equation .val{
+	width: 180px;
+}
+.on-off-parameters .name,
+.on-off-parameters .val{
+	width: 240px;
+}
+
+.equation .operator{
+	float: left;
+	font-size:3em;
+	width: 50px;
+	text-align: center;
+}
+.equation .multiply{
+	margin-top: 0.3em;
+}
+.equation .equals{
+	margin-top: 0.12em;
+}
+.equation .plus{
+	margin-top: 0.15em;
+}
+
+.sum-line{
+	float: left;
+	margin-left: 480px;
+}
+.sum-line .plus{
+	font-size: 3em;
+	font-weight: bold;
+	float: left;
+	width: 50px;
+	text-align: center;
+}
+.sum-line .line{
+	width: 180px;
+	margin-top: 1em;
+	float: left;
+	border: solid 2px;
+}
+
+.equation .beerSet{
+	margin-left: 234px;
+}
+
+#control-algorithm .help-panel{
+	width: 230px;
+	float: right;
+	border: solid 1px #aaaaaa;
+	margin-right: 15px;
+	margin-top: 15px;
+}
+
+.help-panel p{
+	margin: 15px;
+}
+
+#logo-container{
+	float: left;
+	clear: none;
+	display: block;
+	margin-left: 4px;
+	margin-top: 10px;
+	width: 450px;
+	text-align: center;
+}
+
+#logo-container div#beer-name-container{
+	float: left;
+	display: block;
+	line-height: 0.5em;
+	color: #000;
+	width: inherit;
+	margin-top: 10px;
+}
+
+.logo-placeholder a{
+	display:block;
+	font-size: 20px;
+	font-weight: bold;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	width: inherit;
+}
+
+.beer-name-dialog{
+    text-align: center;
+}
+
+.dialog-intro{
+    display: block;
+    margin: 15px;
+}
+
+span.data-logging-state{
+    color: #cc0a0a;
+    font-size: 0.8em;
+}
+
+.beer-name-dialog button.back{
+    height: 26px;
+    width: 26px;
+    float: left;
+    margin: 15px;
+}
+.beer-name-dialog input{
+    display:block;
+    margin: 10px auto 0 auto;
+}
+.beer-name-buttons{
+    display: inline-block; /* scale to content */
+    margin-top: 10px;
+}
+
+.beer-name-buttons button{
+    display: block;
+    clear: both;
+    margin: 10px 0;
+    width: 100%; /* scale to biggest button */
+}
+
+span.dialog-result-success{
+    color: green;
+    display: block;
+    margin: 20px auto;
+}
+
+span.dialog-result-error{
+    color: red;
+    display: block;
+    margin: 20px auto;
+}
+
+span.dialog-result-message{
+    display: block;
+    margin: 20px auto;
+}
+
+div.beer-chart,
+div.chart-container{
+    float: left;
+}
+
+div.chart-error{
+    text-align: center;
+}
+
+span.chart-error-text{
+    margin: 100px 50px;
+    display: block;
+}
+
+button.chart-error-refresh{
+    display: block;
+    margin: 0 auto;
+}
+
+
+#profileSelectDiv { display:none; }
+#profileEditDiv { display:none; }
+#profileHelpDiv { display:none; }
+#profileSaveError { color:red; display:none; }
+
+.help-h1 { font-weight: bold; }
+
+#profileEditChartDiv{ width: 450px; height: 280px; float: left; margin: 20px 0; }
+#profileEditControls{ width: 450px; float: right; margin: 20px 0; }
+
+.profileEditFieldSet { height:54px; }
+.profileTableLabel { float:left; clear: left; height:22px; }
+.profileTableLabel.edit { padding:4px 0 0 0; }
+.profileTableLabel.error { color:red; font-weight: bold; }
+.profileTableField { float:right; clear: right; width:65%; }
+
+.fullwidth-button { display:block; width:100%; margin:5px 0 5px 0; }
+.halfwidth-button { display:block; float:left; width:48%; margin:5px 1% 5px 1%}
+
+.profileTableEdit { margin:0; border:1px solid #ccc; border-right: 0; border-bottom: 0; width:100%; border-collapse:separate; border-spacing: 0; }
+.profileTableEdit tbody TR.odd { background:#f7f7f7; }
+.profileTableEdit tbody TR.even { background:#fff; }
+.profileTableEdit tbody TR:hover { background: #ddeeff; }
+.profileTableEdit tbody TR.selected { background: #bbddff; }
+.profileTableEdit tbody TR.error { background: #fef1ec; border:1px solid #cd0a0a; color: #cd0a0a; }
+.profileTableEdit TD, .profileTableEdit TH { padding: 3px; height: 1em;}
+.profileTableEdit TD { text-align:center; }
+.profileTableEdit TD { border-bottom: solid 1px #ccc; border-right: solid 1px #ccc; }
+.profileTableEdit TH { border-right: solid 1px #fff; }
+.profileTableEdit TH:last-child { border-right: 0 }
+
+
+
+.profileTableMenu {
+    position: absolute;
+    display: none;
+    border: #ccc solid 1px;
+    background: #fff;
+}
+.profileTableMenu UL { list-style-type: none; margin: 0; padding: 0; }
+.profileTableMenu UL LI { margin: 0; padding: 5px; border: 1px solid #fff; border-bottom: 1px solid #ccc; cursor:pointer; cursor:hand; }
+.profileTableMenu UL LI:last-child { border-bottom: 1px solid #fff; }
+.profileTableMenu UL LI:hover { color:#fff; border: 1px solid #4297d7; background: #5c9ccc; }
+
+#profileSelect .ui-selecting { background: #FECA40; }
+#profileSelect .ui-selected { background: #F39814; color: white; }
+#profileSelect { list-style-type: none; margin: 20px 0; padding: 0; float: right; width: 450px;}
+#profileSelect li { margin: 3px; padding: 0.4em; height: 18px; }
+#profileSelectChartDiv{ width: 450px; height: 280px; float: left; margin: 20px 0;}
+
+#profileNameDate { width: 375px; float:right; }
+#profileNameDate div { float:left; clear: left; width:100%;}
+#profileNameDate .profileTableLabel { display: block; float: left; font-weight: bold; margin-left: 5px}
+#profileNameDate .profileTableValue { display: block; float: right; margin-right:5px; }
+
+#profileChartDiv { width: 430px; height: 280px; float: left; }
+
+#profileTableDiv { width: 375px; height: 280px; float: right; overflow: auto; }
+#profileTableDiv table {
+    border-collapse:separate; border-spacing: 0;
+}
+#profileTableDiv th,
+#profileTableDiv td {
+    padding: 3px;
+    text-align: center;
+}
+
+
+/* make sure buttons (Save/Cancel) are on the bottom of all panes, even with floats in the pane */
+.ui-dialog .ui-dialog-buttonpane { clear: both; }
+
+/* css for timepicker */
+
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+
+.ui-timepicker-rtl{ direction: rtl; }
+.ui-timepicker-rtl dl { text-align: right; }
+.ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
+
+.chart-placeholder{ display: block; margin-top:100px; width: 100%; text-align: center;}
+
+/* css for json syntax highlighting */
+pre.json {outline: 1px solid #ccc; padding: 5px; margin: 5px;
+    background-color: #333; color: #808080; width: auto; height: 550px; overflow: auto;}
+.string { color: #32cd32; }
+.number { color: #ff006a; }
+.boolean { color: #00bfff; }
+.null { color: #ff4500; }
+.key { color: #d3d3d3; }

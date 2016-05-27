@@ -1,0 +1,99 @@
+.beer-chart-legend-row.redTemp{
+    color:red
+}
+.beer-chart-legend-row.redSG{
+    color:red
+}
+
+/* red */
+.beer-chart-legend-row .toggle.redTemp{
+    background-color:rgba(255, 0, 0, 0.5);
+    border:1px solid rgba(255, 0, 0, 1);
+}
+
+.beer-chart-legend-row .toggle.redSG{
+    background-color:rgba(255, 0, 0, 0.5);
+    border:1px solid rgba(255, 0, 0, 1);
+}
+
+/* lime  */
+.beer-chart-legend-row .toggle.greenTemp{
+    background-color:rgba(0, 255, 0, 0.5);
+    border:1px solid rgba(0, 255, 0, 1);
+}
+.beer-chart-legend-row .toggle.greenSG{
+    background-color:rgba(0, 255, 0, 0.5);
+    border:1px solid rgba(0, 255, 0, 1);
+}
+
+/* black */
+.beer-chart-legend-row .toggle.blackTemp{
+    background-color:rgba(0, 0, 0, 0.5);
+    border:1px solid rgba(0, 0, 0, 1);
+}
+.beer-chart-legend-row .toggle.blackSG{
+    background-color:rgba(0, 0, 0, 0.5);
+    border:1px solid rgba(0, 0, 0, 1);
+}
+
+/* purple */
+.beer-chart-legend-row .toggle.purpleTemp{
+    background-color:rgba(128, 0, 128, 0.5);
+    border:1px solid rgba(128, 0, 128, 1);
+}
+.beer-chart-legend-row .toggle.purpleSG{
+    background-color:rgba(128, 0, 128, 0.5);
+    border:1px solid rgba(128, 0, 128, 1);
+}
+
+/* orange */
+.beer-chart-legend-row .toggle.orangeTemp{
+    background-color:rgba(255, 165, 0, 0.5);
+    border:1px solid rgba(255, 165, 0, 1);
+}
+.beer-chart-legend-row .toggle.orangeSG{
+    background-color:rgba(255, 165, 0, 0.5);
+    border:1px solid rgba(255, 165, 0, 1);
+}
+
+/* darkblue */
+.beer-chart-legend-row .toggle.blueTemp{
+    background-color:rgba(0, 0, 139, 0.5);
+    border:1px solid rgba(0, 0, 139, 1);
+}
+.beer-chart-legend-row .toggle.blueSG{
+    background-color:rgba(0, 0, 139, 0.5);
+    border:1px solid rgba(0, 0, 139, 1);
+}
+
+/* yellow */
+.beer-chart-legend-row .toggle.yellowTemp{
+    background-color:rgba(255, 255, 0, 0.5);
+    border:1px solid rgba(255, 255, 0, 1);
+}
+.beer-chart-legend-row .toggle.yellowSG{
+    background-color:rgba(255, 255, 0, 0.5);
+    border:1px solid rgba(255, 255, 0, 1);
+}
+/* orchid */
+.beer-chart-legend-row .toggle.pinkTemp{
+    background-color:rgba(218, 112, 214, 0.5);
+    border:1px solid rgba(218, 112, 214, 1);
+}
+.beer-chart-legend-row .toggle.pinkSG{
+    background-color:rgba(218, 112, 214, 0.5);
+    border:1px solid rgba(218, 112, 214, 1);
+}
+
+/* white */
+.beer-chart-legend-row .toggle.inactive{
+    background-color:white;
+}
+
+.dygraph-y2label{
+    font-size:11px;
+}
+.dygraph-ylabel {
+    font-size:11px;
+    margin: 15px 0px 0px 0px;
+}
