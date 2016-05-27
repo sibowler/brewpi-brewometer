@@ -16,8 +16,9 @@ Test that you've now enabled a connection by running the utility in the brewomet
 
 If you see values against your colour brewometer, then the connection has been successful.
 
-The files in the brewpi-web folder should be copied to the /var/www directory
-The files in the brewpi-script folder should be copied to the /home/brewpi directory.
+The files in the `brewpi-web` folder should be copied to the `/var/www` directory.
+
+The files in the `brewpi-script` folder should be copied to the `/home/brewpi` directory.
 
 Once the files have been copied across, you'll need to refresh the web interface and restart the script to start logging.
 
