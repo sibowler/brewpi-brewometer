@@ -25,3 +25,6 @@ The files in the `brewpi-script` folder should be copied to the `/home/brewpi` d
 Once the files have been copied across, you'll need to refresh the web interface and restart the script to start logging.
 
 
+# Notes
+
+The Brewometer calibration functions are not built in yet. The calibration through the app, is currently local to the app and does not impact the raw values coming out of the device. I've spoken with the Brewometer engineers and will look to incorporate the calibration function shortly.
