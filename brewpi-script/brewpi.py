@@ -420,8 +420,10 @@ run = 1
 startBeer(config['beerName'])
 outputTemperature = True
 
-# Initialise brewometer and start monitoring.
-brewometer = Brewometer.BrewometerManager(False)
+# Initialise brewometer and start monitoring. Use 300 Secs averaging of values to smooth out noise.
+# Use a median filter window of 5 to further smooth out noise.
+# (Brewometers generate approx 1.2 readings per sec)
+brewometer = Brewometer.BrewometerManager(False, 300, 10000)
 brewometer.start()
 
 ##Modify prevTempJson to add brewometer elements.
