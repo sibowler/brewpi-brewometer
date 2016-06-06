@@ -27,7 +27,7 @@ Once the files have been copied across, you'll need to refresh the web interface
 
 # Calibration:
 
-To enable calibration for a brewometer create GRAVITY.<colour> or TEMPERATURE.<colour> files in the /home/brewpi/brewometer folder. Example files have been provided to show the syntax.
+To enable calibration for a brewometer create `GRAVITY.<colour>` or `TEMPERATURE.<colour>` files in the `/home/brewpi/brewometer` folder. Example files have been provided to show the syntax.
 
-i.e. To calibrate a Red Brewometer's temperature, a TEMPERATURE.red file should be created with the calibration settings inside.
+i.e. To calibrate a Red Brewometer's temperature, a `TEMPERATURE.red` file should be created with the calibration settings inside.
 
