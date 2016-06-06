@@ -4,7 +4,7 @@ These brewpi and other files have been modified to support the brewometer.
 
 On the raspberry pi you need to install the bluez bnd python-bluez luetooth modules to enable communication with the Brewometer.
 
-	sudo apt-get install bluez python-bluez python-scipy
+	sudo apt-get install bluez python-bluez python-scipy python-numpy
 
 Then you need to enable python to query bluetooth without being root.
 
@@ -32,5 +32,5 @@ To enable calibration for a brewometer create `GRAVITY.<colour>` or `TEMPERATURE
 i.e. To calibrate a Red Brewometer's temperature, a `TEMPERATURE.red` file should be created with the calibration settings inside.
 
 ## Note:
-If this is not your first install of the Brewometer modification, you will need to add the `python-scipy` library via apt-get. This library is used in the calibration function.
+If this is not your first install of the Brewometer modification, you will need to add the `python-scipy` and `python-numpy` libraries via apt-get. These libraries are used in the calibration function.
 
