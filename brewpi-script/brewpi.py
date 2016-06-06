@@ -421,7 +421,7 @@ startBeer(config['beerName'])
 outputTemperature = True
 
 # Initialise brewometer and start monitoring. Use 300 Secs averaging of values to smooth out noise.
-# Use a median filter window of 5 to further smooth out noise.
+# Use a median filter window of 10000 to further smooth out noise. This value effectively disables the 'moving average' functionality, as 300 secs will only generate about 360-380 readings. So a simple median will be applied across the entire set. This means that a true change in temperature/SG will take at least 2.5 mins to be observed.
 # (Brewometers generate approx 1.2 readings per sec)
 brewometer = Brewometer.BrewometerManager(False, 300, 10000)
 brewometer.start()
