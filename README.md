@@ -1,6 +1,6 @@
 These brewpi and other files have been modified to support the brewometer.
 
-Setup:
+#Setup & Testing
 
 On the raspberry pi you need to install the bluez bnd python-bluez luetooth modules to enable communication with the Brewometer.
 
@@ -16,16 +16,18 @@ Test that you've now enabled a connection by running the utility in the brewomet
 
 If you see values against your colour brewometer, then the connection has been successful.
 
-The files in the brewpi-web folder should be copied to the /var/www directory
-The files in the brewpi-script folder should be copied to the /home/brewpi directory.
+# Modifying Brewpi for Brewometer logging
+
+The files in the `brewpi-web` folder should be copied to the `/var/www` directory.
+
+The files in the `brewpi-script` folder should be copied to the `/home/brewpi` directory.
 
 Once the files have been copied across, you'll need to refresh the web interface and restart the script to start logging.
 
 
-Calibration:
+# Calibration:
 
 To enable calibration for a brewometer create GRAVITY.<colour> or TEMPERATURE.<colour> files in the /home/brewpi/brewometer folder. Example files have been provided to show the syntax.
 
 i.e. To calibrate a Red Brewometer's temperature, a TEMPERATURE.red file should be created with the calibration settings inside.
-
 
