@@ -462,7 +462,8 @@ function drawBeerChart(beerToDraw, div){
                     y : { valueFormatter: tempFormat },
                     y2 : { 
                         valueFormatter: gravityFormat,
-                        axisLabelFormatter: gravityFormat
+                        axisLabelFormatter: gravityFormat,
+                        valueRange: [0.990, null]
                     }
                 },
                 highlightCircleSize: 2,
