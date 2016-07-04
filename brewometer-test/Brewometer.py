@@ -7,6 +7,8 @@
 import blescan
 import sys
 import datetime
+import time
+import os
 
 import bluetooth._bluetooth as bluez
 import threading
@@ -20,6 +22,9 @@ import csv
 import functools
 
 BREWOMETER_COLOURS = [ 'Red', 'Green', 'Black', 'Purple', 'Orange', 'Blue', 'Yellow', 'Pink' ]
+
+#Default time in seconds to wait before checking config files to see if calibration data has changed.
+DATA_REFRESH_WINDOW = 60
 
 
 #extrap1d Sourced from sastanin @ StackOverflow:
@@ -55,49 +60,6 @@ def extrapolationCalibration(extrapolationFunction, value):
 def noCalibration(value):
     return value
     
-#Load the calibration settings from file and create the calibration functions    
-def brewometerCalibrationFunction(type, colour):
-    returnFunction = noCalibration
-    
-    originalValues = []
-    actualValues = []
-    csvFile = None
-    filename = "brewometer/" + type.upper() + "." + colour.lower()
-    
-    try:
-        #print "oppening file"
-        csvFile = open(filename, "rb")
-        csvFileReader = csv.reader(csvFile, skipinitialspace=True)
-        
-        for row in csvFileReader:
-            #Skip any comment rows
-            if (row[0][:1] != "#"): 
-                originalValues.append(float(row[0]))
-                actualValues.append(float(row[1]))
-        
-        #Close file
-        csvFile.close()
-    except IOError:
-        print "Brewometer (" + colour + "):  " + type.capitalize() + ": No calibration data (" + filename  + ")"
-    except Exception, e:
-        print "ERROR: Brewometer (" + colour + "): Unable to initialise " + type.capitalize() + " Calibration data (" + filename  + ") - " + e.message
-        #Attempt to close the file
-        if (csvFile is not None):
-            #Close file
-            csvFile.close()
-        
-    #If more than two values, use interpolation
-    if (len(actualValues) >= 2):
-        interpolationFunction = interp1d(originalValues, actualValues, bounds_error=False, fill_value=1)
-        returnFunction = functools.partial(extrapolationCalibration,extrap1d(interpolationFunction))
-        print "Brewometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Interpolation"
-    #Not enough values. Likely just an offset calculation
-    elif (len(actualValues) == 1):
-        offset = actualValues[0] - originalValues[0]
-        returnFunction = functools.partial(offsetCalibration, offset)
-        print "Brewometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Offset (" + str(offset) + ")"
-    return returnFunction
-
 #Median utility function        
 def median(values):
         return numpy.median(numpy.array(values))
@@ -125,6 +87,7 @@ class Brewometer:
     medianWindow = 0
     tempCalibrationFunction = None
     gravityCalibrationFunction = None
+    calibrationDataTime = {}
     
     #Averaging period is number of secs to average across. 0 to disable.
     #Median window is the window to use for applying a median filter accross the values. 0 to disable.
@@ -134,14 +97,25 @@ class Brewometer:
         self.averagingPeriod = averagingPeriod
         self.medianWindow = medianWindow
         self.values = []
-        self.tempCalibrationFunction = brewometerCalibrationFunction("temperature", colour)
-        self.gravityCalibrationFunction = brewometerCalibrationFunction("gravity", colour)
-
+        self.calibrate()
+    
+    def calibrate(self):
+        """Load/reload calibration functions."""
+        #Check for temperature function. If none, then not changed since last load.
+        tempFunction = self.brewometerCalibrationFunction("temperature", self.colour)
+        if (tempFunction is not None):
+            self.tempCalibrationFunction = tempFunction
+            
+        #Check for gravity function. If none, then not changed since last load.
+        gravityFunction = self.brewometerCalibrationFunction("gravity", self.colour)
+        if (gravityFunction is not None):
+            self.gravityCalibrationFunction = gravityFunction
 
     def setValues(self, temperature, gravity):
         """Set/add the latest temperature & gravity readings to the store. These values will be calibrated before storing if calibration is enabled"""
         with self.lock:
-            self.cleanValues();
+            self.cleanValues()
+            self.calibrate()
             calibratedTemperature = self.tempCalibrationFunction(temperature)
             calibratedGravity = self.gravityCalibrationFunction(gravity)
             self.values.append(BrewometerValue(calibratedTemperature, calibratedGravity))
@@ -230,7 +204,64 @@ class Brewometer:
             else:
                 #The list is sorted in chronological order, so once we've hit this condition we can stop searching.
                 break
+    
+    #Load the calibration settings from file and create the calibration functions    
+    def brewometerCalibrationFunction(self, type, colour):
+        returnFunction = noCalibration
+        
+        originalValues = []
+        actualValues = []
+        csvFile = None
+        filename = "brewometer/" + type.upper() + "." + colour.lower()
 
+        lastChecked = self.calibrationDataTime.get(type + "_checked", 0)
+        if ((int(time.time()) - lastChecked) < DATA_REFRESH_WINDOW):
+            #Only check every x seconds
+            return None
+        
+        
+        lastLoaded = self.calibrationDataTime.get(type, 0)
+        self.calibrationDataTime[type + "_checked"] = int(time.time())
+        
+        try:
+            #print "opening file"
+            if (os.path.isfile(filename)):
+                fileModificationTime = os.path.getmtime(filename)
+                if (lastLoaded >= fileModificationTime):
+                    #No need to load, no change
+                    return None
+                csvFile = open(filename, "rb")
+                csvFileReader = csv.reader(csvFile, skipinitialspace=True)
+                self.calibrationDataTime[type] = fileModificationTime
+                
+                for row in csvFileReader:
+                    #Skip any comment rows
+                    if (row[0][:1] != "#"): 
+                        originalValues.append(float(row[0]))
+                        actualValues.append(float(row[1]))
+                
+                #Close file
+                csvFile.close()
+        except IOError:
+            print "Brewometer (" + colour + "):  " + type.capitalize() + ": No calibration data (" + filename  + ")"
+        except Exception, e:
+            print "ERROR: Brewometer (" + colour + "): Unable to initialise " + type.capitalize() + " Calibration data (" + filename  + ") - " + e.message
+            #Attempt to close the file
+            if (csvFile is not None):
+                #Close file
+                csvFile.close()
+            
+        #If more than two values, use interpolation
+        if (len(actualValues) >= 2):
+            interpolationFunction = interp1d(originalValues, actualValues, bounds_error=False, fill_value=1)
+            returnFunction = functools.partial(extrapolationCalibration,extrap1d(interpolationFunction))
+            print "Brewometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Interpolation"
+        #Not enough values. Likely just an offset calculation
+        elif (len(actualValues) == 1):
+            offset = actualValues[0] - originalValues[0]
+            returnFunction = functools.partial(offsetCalibration, offset)
+            print "Brewometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Offset (" + str(offset) + ")"
+        return returnFunction
 #Class to manage the monitoring of all Brewometers and storing the read values.                
 class BrewometerManager:
     inFarenheight = True
