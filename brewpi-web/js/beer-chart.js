@@ -455,7 +455,7 @@ function drawBeerChart(beerToDraw, div){
                         strokePattern: [7, 3]
                     }
                 },
-                ylabel: 'Temperature (C)',
+                ylabel: 'Temperature',
                 y2label: 'Gravity (SG)',
                 yAxisLabelWidth: 50,
                 axes: {
