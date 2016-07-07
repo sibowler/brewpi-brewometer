@@ -4,6 +4,7 @@ import thread
 import time
 
 brewometer = Brewometer.BrewometerManager(False, 60, 40)
+brewometer.loadSettings()
 brewometer.start()
 
 def toString(value):

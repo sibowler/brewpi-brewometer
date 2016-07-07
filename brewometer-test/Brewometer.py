@@ -20,6 +20,7 @@ from scipy.interpolate import interp1d
 from scipy import arange, array, exp
 import csv
 import functools
+import ConfigParser
 
 BREWOMETER_COLOURS = [ 'Red', 'Green', 'Black', 'Purple', 'Orange', 'Blue', 'Yellow', 'Pink' ]
 
@@ -90,7 +91,8 @@ class Brewometer:
     calibrationDataTime = {}
     
     #Averaging period is number of secs to average across. 0 to disable.
-    #Median window is the window to use for applying a median filter accross the values. 0 to disable.
+    #Median window is the window to use for applying a median filter accross the values. 0 to disable. Median window should be <= the averaging period. 
+    #If Median is disabled, the returned value will be the average of all values recorded during the averaging period.
     def __init__(self, colour, averagingPeriod = 0, medianWindow = 0):
         self.colour = colour
         self.lock = threading.Lock()
@@ -264,7 +266,7 @@ class Brewometer:
         return returnFunction
 #Class to manage the monitoring of all Brewometers and storing the read values.                
 class BrewometerManager:
-    inFarenheight = True
+    inFahrenheit = True
     dev_id = 0
     averagingPeriod = 0
     medianWindow = 0
@@ -275,8 +277,8 @@ class BrewometerManager:
     
     brewthread = None
     
-    def __init__(self, inFarenheight = True, averagingPeriod = 0, medianWindow = 0, device_id = 0):
-        self.inFarenheight = inFarenheight
+    def __init__(self, inFahrenheit = True, averagingPeriod = 0, medianWindow = 0, device_id = 0):
+        self.inFahrenheit = inFahrenheit
         self.dev_id = device_id
         self.averagingPeriod = averagingPeriod
         self.medianWindow = medianWindow
@@ -295,7 +297,7 @@ class BrewometerManager:
         }.get(uuid)
 
     def convertFtoC(self, temperatureF):
-        return (int(temperatureF) - 32) * 5.0 / 9
+        return (temperatureF - 32) * 5.0 / 9
     
     def convertSG(self, gravity):
         return float(gravity)/ 1000
@@ -323,8 +325,8 @@ class BrewometerManager:
         try:
             sock = bluez.hci_open_dev(self.dev_id)
 
-        except:
-            print "error accessing bluetooth device..."
+        except Exception, e:
+            print "ERROR: Accessing bluetooth device: " + e.message
             sys.exit(1)
 
         blescan.hci_le_set_scan_parameters(sock)
@@ -344,8 +346,8 @@ class BrewometerManager:
                 #If the event is for a brewometer, process the data
                 if name is not None:
                     #Get the temperature and convert to C if needed.
-                    temperature = beaconParts[2]
-                    if not self.inFarenheight:
+                    temperature = int(beaconParts[2])
+                    if not self.inFahrenheit:
                         temperature = self.convertFtoC(temperature)
                     
                     #Get the gravity.
@@ -362,4 +364,21 @@ class BrewometerManager:
     def start(self):
         self.scanning = True
         self.brewthread = thread.start_new_thread(self.scan, ())
+    
+    #Load Settings from config file, overriding values given at creation. This needs to be called before the start function is called.
+    def loadSettings(self):
+        filename = "brewometer/settings.ini"
+        try:
+            config = ConfigParser.ConfigParser()
+            config.read(filename)
+            
+            #Load config values
+            self.inFahrenheit = config.getboolean("Manager","FahrenheitTemperatures")
+            self.dev_ID = config.getint("Manager","DeviceID")
+            self.averagingPeriod = config.getint("Manager","AveragePeriodSeconds")
+            self.medianWindow = config.getint("Manager","MedianWindowVals")
+            
+
+        except Exception, e:
+            print "ERROR: Loading default settings file (brewometer/settings.ini): " + e.message
 
