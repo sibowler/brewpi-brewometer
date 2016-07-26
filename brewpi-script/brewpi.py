@@ -38,7 +38,7 @@ import urllib
 from distutils.version import LooseVersion
 from serial import SerialException
 
-import Brewometer
+import TiltHydrometer
 import thread
 
 # load non standard packages, exit when they are not installed
@@ -420,14 +420,14 @@ run = 1
 startBeer(config['beerName'])
 outputTemperature = True
 
-# Initialise brewometer and start monitoring. Use 300 Secs averaging of values to smooth out noise.
+# Initialise Tilt Hydrometer and start monitoring. Use 300 Secs averaging of values to smooth out noise.
 # Use a median filter window of 10000 to further smooth out noise. This value effectively disables the 'moving average' functionality, as 300 secs will only generate about 360-380 readings. So a simple median will be applied across the entire set. This means that a true change in temperature/SG will take at least 2.5 mins to be observed.
-# (Brewometers generate approx 1.2 readings per sec)
-brewometer = Brewometer.BrewometerManager()
-brewometer.loadSettings()
-brewometer.start()
+# (Tilts generate approx 1.2 readings per sec)
+tiltHydrometer = TiltHydrometer.TiltHydrometerManager()
+tiltHydrometer.loadSettings()
+tiltHydrometer.start()
 
-##Modify prevTempJson to add brewometer elements.
+##Modify prevTempJson to add tilt hydrometer elements.
 prevTempJson = {
     "BeerTemp": 0,
     "FridgeTemp": 0,
@@ -765,13 +765,13 @@ while run:
                         for key in newData:
                             prevTempJson[renameTempKey(key)] = newData[key]
                         
-                        ##Retrieve the current brewometer values
-                        for colour in Brewometer.BREWOMETER_COLOURS:
-                            brewometerValue = brewometer.getValue(colour)
+                        ##Retrieve the current tilt hydrometer values
+                        for colour in TiltHydrometer.TILTHYDROMETER_COLOURS:
+                            tiltHydrometerValue = tiltHydrometer.getValue(colour)
 
-                            if brewometerValue is not None:
-                                prevTempJson[colour + 'Temp'] = round(brewometerValue.temperature, 2)
-                                prevTempJson[colour + 'SG'] = brewometerValue.gravity
+                            if tiltHydrometerValue is not None:
+                                prevTempJson[colour + 'Temp'] = round(tiltHydrometerValue.temperature, 2)
+                                prevTempJson[colour + 'SG'] = tiltHydrometerValue.gravity
                             else:
                                 prevTempJson[colour + 'Temp'] = None
                                 prevTempJson[colour + 'SG'] = None
@@ -796,8 +796,8 @@ while run:
                                            json.dumps(newRow['State']) + ';' +
                                            json.dumps(newRow['RoomTemp']) + ';')
                         
-                            # Write out Brewometer Temp and SG Values
-                            for colour in Brewometer.BREWOMETER_COLOURS:
+                            # Write out Tilt Hydrometer Temp and SG Values
+                            for colour in TiltHydrometer.TILTHYDROMETER_COLOURS:
                                 if prevTempJson.get(colour + 'Temp') is not None:
                                     lineToWrite += (json.dumps(prevTempJson[colour + 'Temp']) + ';' +
                                                 json.dumps(prevTempJson[colour + 'SG']) + ';')
@@ -871,9 +871,9 @@ while run:
 if bg_ser:
     bg_ser.stop()
 
-#Stop monitoring the brewometer
-if brewometer:
-	brewometer.stop()
+#Stop monitoring the Tilt Hydrometer
+if tiltHydrometer:
+	tiltHydrometer.stop()
 
 if ser:
     if ser.isOpen():

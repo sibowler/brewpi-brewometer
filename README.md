@@ -1,10 +1,10 @@
-These brewpi and other files have been modified to support the brewometer.
+These brewpi and other files have been modified to support the Tilt Hydrometer.
 
 #Setup & Testing
 
 Ensure you are updated to the latest version of Brewpi using the update script in the `brewpi-tools` folder.
 
-On the raspberry pi you need to install the bluez bnd python-bluez luetooth modules to enable communication with the Brewometer.
+On the raspberry pi you need to install the bluez bnd python-bluez luetooth modules to enable communication with the Tilt Hydrometer.
 
 	sudo apt-get install bluez python-bluez python-scipy python-numpy libcap2-bin
 
@@ -12,13 +12,13 @@ Then you need to enable python to query bluetooth without being root.
 
 	sudo setcap cap_net_raw+eip $(eval readlink -f `which python`)
 
-Test that you've now enabled a connection by running the utility in the brewometer-test folder (this should not be run as root to test that we've enabled the appropriate permissions)
+Test that you've now enabled a connection by running the utility in the tiltHydrometer-test folder (this should not be run as root to test that we've enabled the appropriate permissions)
 	
-	python BrewometerTest.py
+	python TiltHydrometerTest.py
 
-If you see values against your colour brewometer, then the connection has been successful.
+If you see values against your colour Tilt Hydrometer, then the connection has been successful.
 
-# Modifying Brewpi for Brewometer logging
+# Modifying Brewpi for Tilt Hydrometer logging
 
 Ensure you have stopped any active logging.
 
@@ -31,10 +31,10 @@ Once the files have been copied across, you'll need to refresh the web interface
 
 # Calibration:
 
-To enable calibration for a brewometer create `GRAVITY.<colour>` or `TEMPERATURE.<colour>` files in the `/home/brewpi/brewometer` folder. Example files have been provided to show the syntax.
+To enable calibration for a Tilt Hydrometer create `GRAVITY.<colour>` or `TEMPERATURE.<colour>` files in the `/home/brewpi/tiltHydrometer` folder. Example files have been provided to show the syntax.
 
-i.e. To calibrate a Red Brewometer's temperature, a `TEMPERATURE.red` file should be created with the calibration settings inside.
+i.e. To calibrate a Red Tilt Hydrometer's temperature, a `TEMPERATURE.red` file should be created with the calibration settings inside.
 
 ## Note:
-If this is not your first install of the Brewometer modification, you will need to add the `python-scipy` and `python-numpy` libraries via apt-get. These libraries are used in the calibration function.
+If this is not your first install of the Tilt Hydrometer modification, you will need to add the `python-scipy` and `python-numpy` libraries via apt-get. These libraries are used in the calibration function.
 

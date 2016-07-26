@@ -66,7 +66,7 @@ function prepareJSON($input) {
 		<title>BrewPi reporting for duty!</title>
 		<link type="text/css" href="css/redmond/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
 		<link type="text/css" href="css/style.css" rel="stylesheet"/>
-        <link type="text/css" href="css/brewometer.css" rel="stylesheet"/>
+		<link type="text/css" href="css/tiltHydrometer.css" rel="stylesheet"/>
 		<link rel="apple-touch-icon" href="touch-icon-iphone.png">
         <link rel="apple-touch-icon" sizes="76x76" href="touch-icon-ipad.png">
         <link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone-retina.png">

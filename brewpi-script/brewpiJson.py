@@ -18,10 +18,10 @@ from datetime import datetime
 import time
 import os
 import re
-import Brewometer
+import TiltHydrometer
 
 
-#Includes changes form brewometer data
+#Includes changes for tilt hydrometer data
 jsonCols = ("\"cols\":[" +
             "{\"type\":\"datetime\",\"id\":\"Time\",\"label\":\"Time\"}," +
             "{\"type\":\"number\",\"id\":\"BeerTemp\",\"label\":\"Beer temperature\"}," +
@@ -32,22 +32,22 @@ jsonCols = ("\"cols\":[" +
             "{\"type\":\"string\",\"id\":\"FridgeAnn\",\"label\":\"Fridge Annotate\"}," +
             "{\"type\":\"number\",\"id\":\"RoomTemp\",\"label\":\"Room temp.\"}," +
             "{\"type\":\"number\",\"id\":\"State\",\"label\":\"State\"}," +
-			"{\"type\":\"number\",\"id\":\"RedTemp\",\"label\":\"Red Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"RedSG\",\"label\":\"Red Brewometer Gravity\"}," +
-			"{\"type\":\"number\",\"id\":\"GreenTemp\",\"label\":\"Green Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"GreenSG\",\"label\":\"Green Brewometer Gravity\"}," +
-			"{\"type\":\"number\",\"id\":\"BlackTemp\",\"label\":\"Black Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"BlackSG\",\"label\":\"Black Brewometer Gravity\"}," +
-			"{\"type\":\"number\",\"id\":\"PurpleTemp\",\"label\":\"Purple Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"PurpleSG\",\"label\":\"Purple Brewometer Gravity\"}," +
-			"{\"type\":\"number\",\"id\":\"OrangeTemp\",\"label\":\"Orange Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"OrangeSG\",\"label\":\"Orange Brewometer Gravity\"}," +
-			"{\"type\":\"number\",\"id\":\"BlueTemp\",\"label\":\"Blue Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"BlueSG\",\"label\":\"Blue Brewometer Gravity\"}," +
-			"{\"type\":\"number\",\"id\":\"YellowTemp\",\"label\":\"Yellow Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"YellowSG\",\"label\":\"Yellow Brewometer Gravity\"}," +
-			"{\"type\":\"number\",\"id\":\"PinkTemp\",\"label\":\"Pink Brewometer temp.\"}," +
-			"{\"type\":\"number\",\"id\":\"PinkSG\",\"label\":\"Pink Brewometer Gravity\"}" +
+			"{\"type\":\"number\",\"id\":\"RedTemp\",\"label\":\"Red Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"RedSG\",\"label\":\"Red Tilt Gravity\"}," +
+			"{\"type\":\"number\",\"id\":\"GreenTemp\",\"label\":\"Green Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"GreenSG\",\"label\":\"Green Tilt Gravity\"}," +
+			"{\"type\":\"number\",\"id\":\"BlackTemp\",\"label\":\"Black Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"BlackSG\",\"label\":\"Black Tilt Gravity\"}," +
+			"{\"type\":\"number\",\"id\":\"PurpleTemp\",\"label\":\"Purple Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"PurpleSG\",\"label\":\"Purple Tilt Gravity\"}," +
+			"{\"type\":\"number\",\"id\":\"OrangeTemp\",\"label\":\"Orange Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"OrangeSG\",\"label\":\"Orange Tilt Gravity\"}," +
+			"{\"type\":\"number\",\"id\":\"BlueTemp\",\"label\":\"Blue Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"BlueSG\",\"label\":\"Blue Tilt Gravity\"}," +
+			"{\"type\":\"number\",\"id\":\"YellowTemp\",\"label\":\"Yellow Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"YellowSG\",\"label\":\"Yellow Tilt Gravity\"}," +
+			"{\"type\":\"number\",\"id\":\"PinkTemp\",\"label\":\"Pink Tilt temp.\"}," +
+			"{\"type\":\"number\",\"id\":\"PinkSG\",\"label\":\"Pink Tilt Gravity\"}" +
             "]")
 
 
@@ -119,8 +119,8 @@ def addRow(jsonFileName, row):
 	else:
 		jsonFile.write("{\"v\":" + str(row['State']) + "}")
 	
-	#Write out brewometer values
-	for colour in Brewometer.BREWOMETER_COLOURS:
+	#Write out Tilt Hydrometer values
+	for colour in TiltHydrometer.TILTHYDROMETER_COLOURS:
 		jsonFile.write(",")
 		if row.get(colour + 'Temp', None) is None:
 			jsonFile.write("null,")

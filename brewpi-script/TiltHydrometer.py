@@ -1,8 +1,10 @@
-# Brewometer polling library
-# Simon Bowler 06/06/2016
+# Tilt Hydrometer  Tilt polling library
+# Simon Bowler 25/06/2016
 # simon@bowler.id.au
 # 
-# Version: 1.1 - Added calibration and smoothing functions to reduce noise.
+# Version: 1.2 - Added ability to get smoothed value, current value (calibrated)
+#                and an measure of variance (can indicate vigor of fermentation).
+#                Renamed library to reflect new name of product
 
 import blescan
 import sys
@@ -22,7 +24,7 @@ import csv
 import functools
 import ConfigParser
 
-BREWOMETER_COLOURS = [ 'Red', 'Green', 'Black', 'Purple', 'Orange', 'Blue', 'Yellow', 'Pink' ]
+TILTHYDROMETER_COLOURS = [ 'Red', 'Green', 'Black', 'Purple', 'Orange', 'Blue', 'Yellow', 'Pink' ]
 
 #Default time in seconds to wait before checking config files to see if calibration data has changed.
 DATA_REFRESH_WINDOW = 60
@@ -65,8 +67,8 @@ def noCalibration(value):
 def median(values):
         return numpy.median(numpy.array(values))
 
-#Class to hold a Brewometer reading
-class BrewometerValue:
+#Class to hold a TiltHydrometer reading
+class TiltHydrometerValue:
     temperature = 0
     gravity = 0
     timestamp = 0
@@ -79,8 +81,8 @@ class BrewometerValue:
     def __str__(self):
         return "T: " + str(self.temperature) + " G: " + str(self.gravity)
 
-#Brewometer class, looks after calibration, storing of values and smoothing of read values.        
-class Brewometer:
+#TiltHydrometer class, looks after calibration, storing of values and smoothing of read values.        
+class TiltHydrometer:
     colour = ''
     values = None
     lock = None
@@ -104,12 +106,12 @@ class Brewometer:
     def calibrate(self):
         """Load/reload calibration functions."""
         #Check for temperature function. If none, then not changed since last load.
-        tempFunction = self.brewometerCalibrationFunction("temperature", self.colour)
+        tempFunction = self.tiltHydrometerCalibrationFunction("temperature", self.colour)
         if (tempFunction is not None):
             self.tempCalibrationFunction = tempFunction
             
         #Check for gravity function. If none, then not changed since last load.
-        gravityFunction = self.brewometerCalibrationFunction("gravity", self.colour)
+        gravityFunction = self.tiltHydrometerCalibrationFunction("gravity", self.colour)
         if (gravityFunction is not None):
             self.gravityCalibrationFunction = gravityFunction
 
@@ -118,12 +120,24 @@ class Brewometer:
         with self.lock:
             self.cleanValues()
             self.calibrate()
-            calibratedTemperature = self.tempCalibrationFunction(temperature)
-            calibratedGravity = self.gravityCalibrationFunction(gravity)
-            self.values.append(BrewometerValue(calibratedTemperature, calibratedGravity))
+            
+            calibratedTemperature = temperature
+            calibratedGravity = gravity
+            
+            try:
+                calibratedTemperature = self.tempCalibrationFunction(temperature)
+            except Exception, e:
+                print "ERROR: TiltHydrometer (" + self.colour + "): Unable to calibrate temperature: " + str(temperature) + " - " + e.message
+                
+            try:
+                calibratedGravity = self.gravityCalibrationFunction(gravity)
+            except Exception, e:
+                print "ERROR: TiltHydrometer (" + self.colour + "): Unable to calibrate gravity: " + str(gravity) + " - " + e.message
+            
+            self.values.append(TiltHydrometerValue(calibratedTemperature, calibratedGravity))
             
     def getValues(self):
-        """Returns the temperature & gravity values of the brewometer. This will be the latest read value unless averaging / median has been enabled"""
+        """Returns the temperature & gravity values of the Tilt Hydrometer . This will be the latest read value unless averaging / median has been enabled"""
         with self.lock:
             returnValue = None
             if (len(self.values) > 0):
@@ -139,7 +153,7 @@ class Brewometer:
         """Internal function to average all the stored values"""
         returnValue = None
         if (len(self.values) > 0):
-            returnValue = BrewometerValue(0,0)
+            returnValue = TiltHydrometerValue(0,0)
             for value in self.values:
                 returnValue.temperature += value.temperature
                 returnValue.gravity += value.gravity
@@ -163,7 +177,7 @@ class Brewometer:
             window = len(self.values)
     
         #print "Median filter!"
-        returnValue = BrewometerValue(0,0)
+        returnValue = TiltHydrometerValue(0,0)
         
         sidebars = (window - 1) / 2
         medianValueCount = 0
@@ -208,13 +222,13 @@ class Brewometer:
                 break
     
     #Load the calibration settings from file and create the calibration functions    
-    def brewometerCalibrationFunction(self, type, colour):
+    def tiltHydrometerCalibrationFunction(self, type, colour):
         returnFunction = noCalibration
         
         originalValues = []
         actualValues = []
         csvFile = None
-        filename = "brewometer/" + type.upper() + "." + colour.lower()
+        filename = "tiltHydrometer/" + type.upper() + "." + colour.lower()
 
         lastChecked = self.calibrationDataTime.get(type + "_checked", 0)
         if ((int(time.time()) - lastChecked) < DATA_REFRESH_WINDOW):
@@ -245,9 +259,9 @@ class Brewometer:
                 #Close file
                 csvFile.close()
         except IOError:
-            print "Brewometer (" + colour + "):  " + type.capitalize() + ": No calibration data (" + filename  + ")"
+            print "TiltHydrometer (" + colour + "):  " + type.capitalize() + ": No calibration data (" + filename  + ")"
         except Exception, e:
-            print "ERROR: Brewometer (" + colour + "): Unable to initialise " + type.capitalize() + " Calibration data (" + filename  + ") - " + e.message
+            print "ERROR: TiltHydrometer (" + colour + "): Unable to initialise " + type.capitalize() + " Calibration data (" + filename  + ") - " + e.message
             #Attempt to close the file
             if (csvFile is not None):
                 #Close file
@@ -257,23 +271,23 @@ class Brewometer:
         if (len(actualValues) >= 2):
             interpolationFunction = interp1d(originalValues, actualValues, bounds_error=False, fill_value=1)
             returnFunction = functools.partial(extrapolationCalibration,extrap1d(interpolationFunction))
-            print "Brewometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Interpolation"
+            print "TiltHydrometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Interpolation"
         #Not enough values. Likely just an offset calculation
         elif (len(actualValues) == 1):
             offset = actualValues[0] - originalValues[0]
             returnFunction = functools.partial(offsetCalibration, offset)
-            print "Brewometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Offset (" + str(offset) + ")"
+            print "TiltHydrometer (" + colour + "): Initialised " + type.capitalize() + " Calibration: Offset (" + str(offset) + ")"
         return returnFunction
-#Class to manage the monitoring of all Brewometers and storing the read values.                
-class BrewometerManager:
+#Class to manage the monitoring of all TiltHydrometers and storing the read values.                
+class TiltHydrometerManager:
     inFahrenheit = True
     dev_id = 0
     averagingPeriod = 0
     medianWindow = 0
     
     scanning = True
-    #Dictionary to hold brewometers - index on colour
-    brewometers = {}
+    #Dictionary to hold tiltHydrometers - index on colour
+    tiltHydrometers = {}
     
     brewthread = None
     
@@ -284,7 +298,7 @@ class BrewometerManager:
         self.medianWindow = medianWindow
 
 
-    def brewometerName(self, uuid):
+    def tiltHydrometerName(self, uuid):
         return {
                 'a495bb10c5b14b44b5121370f02d74de' : 'Red',
                 'a495bb20c5b14b44b5121370f02d74de' : 'Green',
@@ -304,20 +318,20 @@ class BrewometerManager:
     
     #Store function
     def storeValue(self, colour, temperature, gravity):
-        brewometer = self.brewometers.get(colour)
-        if (brewometer is None):
-            brewometer = Brewometer(colour, self.averagingPeriod, self.medianWindow)
-            self.brewometers[colour] = brewometer
+        tiltHydrometer = self.tiltHydrometers.get(colour)
+        if (tiltHydrometer is None):
+            tiltHydrometer = TiltHydrometer(colour, self.averagingPeriod, self.medianWindow)
+            self.tiltHydrometers[colour] = tiltHydrometer
             
         
-        brewometer.setValues(temperature, gravity)
+        tiltHydrometer.setValues(temperature, gravity)
         
     #Retrieve function.
     def getValue(self, colour):
         returnValue = None
-        brewometer = self.brewometers.get(colour)
-        if (brewometer is not None):
-            returnValue = brewometer.getValues()
+        tiltHydrometer = self.tiltHydrometers.get(colour)
+        if (tiltHydrometer is not None):
+            returnValue = tiltHydrometer.getValues()
         return returnValue
         
     #Scanner function
@@ -340,10 +354,10 @@ class BrewometerManager:
             for beacon in returnedList:
                 beaconParts = beacon.split(",")
                 
-                #Resolve whether the received BLE event is for a brewometer by looking at the UUID.
-                name = self.brewometerName(beaconParts[1])
+                #Resolve whether the received BLE event is for a Tilt Hydrometer by looking at the UUID.
+                name = self.tiltHydrometerName(beaconParts[1])
                 
-                #If the event is for a brewometer, process the data
+                #If the event is for a Tilt Hydrometer , process the data
                 if name is not None:
                     #Get the temperature and convert to C if needed.
                     temperature = int(beaconParts[2])
@@ -353,7 +367,7 @@ class BrewometerManager:
                     #Get the gravity.
                     gravity = self.convertSG(beaconParts[3])
                     
-                    #Store the retrieved values in the relevant brewometer object.
+                    #Store the retrieved values in the relevant Tilt Hydrometer object.
                     self.storeValue(name, temperature, gravity)
 
     #Stop Scanning function
@@ -367,7 +381,7 @@ class BrewometerManager:
     
     #Load Settings from config file, overriding values given at creation. This needs to be called before the start function is called.
     def loadSettings(self):
-        filename = "brewometer/settings.ini"
+        filename = "tiltHydrometer/settings.ini"
         try:
             config = ConfigParser.ConfigParser()
             config.read(filename)
@@ -380,5 +394,5 @@ class BrewometerManager:
             
 
         except Exception, e:
-            print "ERROR: Loading default settings file (brewometer/settings.ini): " + e.message
+            print "ERROR: Loading default settings file (tiltHydrometer/settings.ini): " + e.message
 

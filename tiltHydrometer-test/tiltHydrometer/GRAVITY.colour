@@ -1,0 +1,12 @@
+#Gravity Calibration file for Tilt Hydrometer
+#To be active, the file should be named GRAVITY.<colour> in the tiltHydrometer/ folder
+#and have at least one calibration value inside.
+#So to calibrate a black tilt hydrometer, the file would be called GRAVITY.black
+#The following example two calibration points are used. 
+#0.997 read from the tilt hydrometer will be calibrated to the actual value of 0.999
+#1.056 read from the tilt hydrometer will be calibrated to the actual value of 1.060
+#Other calibration points will be calculated.
+
+#Original SG Value, Calibrated Value
+0.997, 0.999
+1.056, 1.060

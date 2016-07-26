@@ -32,29 +32,29 @@ var colorHeatingMinTime = "rgba(255, 0, 0, 0.6)";
 var colorCoolingMinTime = "rgba(0, 0, 255, 0.6)";
 var colorWaitingPeakDetect = "rgba(0, 0, 0, 0.2)";
 
-//Modification: Brewometer line names and legend
+//Modification: Tilt Hydrometer line names and legend
 var lineNames = {
     beerTemp: 'Beer temperature',
     beerSet: 'Beer setting',
     fridgeTemp: 'Fridge temperature',
     fridgeSet: 'Fridge setting',
     roomTemp: 'Room temp.',
-    redTemp: 'Red BO Temp.',
-    redSG: 'Red BO SG',
-    greenTemp: 'Green BO Temp.',
-    greenSG: 'Green BO SG',
-    blackTemp: 'Black BO Temp.',
-    blackSG: 'Black BO SG',
-    purpleTemp: 'Purple BO Temp.',
-    purpleSG: 'Purple BO SG',
-    orangeTemp: 'Orange BO Temp.',
-    orangeSG: 'Orange BO SG',
-    blueTemp: 'Blue BO Temp.',
-    blueSG: 'Blue BO SG',
-    yellowTemp: 'Yellow BO Temp.',
-    yellowSG: 'Yellow BO SG',
-    pinkTemp: 'Pink BO Temp.',
-    pinkSG: 'Pink BO SG'};
+    redTemp: 'Red Tilt Temp.',
+    redSG: 'Red Tilt SG',
+    greenTemp: 'Green Tilt Temp.',
+    greenSG: 'Green Tilt SG',
+    blackTemp: 'Black Tilt Temp.',
+    blackSG: 'Black Tilt SG',
+    purpleTemp: 'Purple Tilt Temp.',
+    purpleSG: 'Purple Tilt SG',
+    orangeTemp: 'Orange Tilt Temp.',
+    orangeSG: 'Orange Tilt SG',
+    blueTemp: 'Blue Tilt Temp.',
+    blueSG: 'Blue Tilt SG',
+    yellowTemp: 'Yellow Tilt Temp.',
+    yellowSG: 'Yellow Tilt SG',
+    pinkTemp: 'Pink Tilt Temp.',
+    pinkSG: 'Pink Tilt SG'};
 var legendStorageKeyPrefix = "legendLine_";
 
 var TIME_COLUMN = 0;        // time is the first column of data
@@ -297,7 +297,7 @@ function paintBackgroundImpl(canvas, area, g) {
         startX = endX;
     }
 }
-//Modification: Brewometer colours
+//Modification: Tilt Hydrometer colours
 var chartColors = [ 'rgb(41,170,41)', 'rgb(240, 100, 100)', 'rgb(89, 184, 255)',  'rgb(255, 161, 76)', '#AAAAAA', 'rgb(153,0,153)', 'red', 'red', 'lime', 'lime', 'black', 'black', 'purple', 'purple', 'orange', 'orange', 'darkblue', 'darkblue', 'yellow', 'yellow', 'orchid', 'orchid' ];
 function formatForChartLegend(v) {
     "use strict";

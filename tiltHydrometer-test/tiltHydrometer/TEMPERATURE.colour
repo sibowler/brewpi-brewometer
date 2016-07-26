@@ -1,0 +1,11 @@
+#Temperature Calibration file for Tilt Hydrometer
+#To be active, the file should be named TEMPERATURE.<colour> in the tileHydrometer/ folder
+#and have at least one calibration value inside.
+#So to calibrate a red tilt hydrometer, the file would be called TEMPERATURE.red
+#The following example one calibration points are used. 
+#16.5C read from the tilt hydrometer will be calibrated to the actual value of 15C
+#Farenheight values could also be used if the TiltHydrometerManager is set to work in Farenheight
+#Other calibration points will be calculated.
+
+#Original Value, Actual Value
+16.5, 15
