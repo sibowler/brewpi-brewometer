@@ -1,5 +1,12 @@
 These brewpi and other files have been modified to support the Tilt Hydrometer.
 
+#NOTE: Upgrading from previous Brewometer install.
+
+The references to Brewometer have been changed to Tilt. As such, if you are updating from an existing install, you will need to do the following:
+
+1. Rename `/home/brewpi/brewometer` directory to `/home/brewpi/tiltHydrometer`
+2. Ensure the existing Brewometer.py file has been deleted (note the code will still work if this file remains. This is just a cleanup step.
+
 #Setup & Testing
 
 Ensure you are updated to the latest version of Brewpi using the update script in the `brewpi-tools` folder.
