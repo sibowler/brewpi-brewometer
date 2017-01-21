@@ -1,7 +1,10 @@
 # Tilt Hydrometer  Tilt polling library
-# Simon Bowler 25/06/2016
+# Simon Bowler 22/01/2017
 # simon@bowler.id.au
 # 
+# Version: 1.4 - Added additional resiliance and debugging when parsing configuration files. 
+#                Also added debug parameter to settings.ini to provide additional logging.
+# Version: 1.3 - Upgraded for firmware 0.4.4
 # Version: 1.2 - Added ability to get smoothed value, current value (calibrated)
 #                and an measure of variance (can indicate vigor of fermentation).
 #                Renamed library to reflect new name of product
@@ -84,6 +87,7 @@ class TiltHydrometerValue:
 #TiltHydrometer class, looks after calibration, storing of values and smoothing of read values.        
 class TiltHydrometer:
     colour = ''
+    debug = False
     values = None
     lock = None
     averagingPeriod = 0
@@ -95,11 +99,12 @@ class TiltHydrometer:
     #Averaging period is number of secs to average across. 0 to disable.
     #Median window is the window to use for applying a median filter accross the values. 0 to disable. Median window should be <= the averaging period. 
     #If Median is disabled, the returned value will be the average of all values recorded during the averaging period.
-    def __init__(self, colour, averagingPeriod = 0, medianWindow = 0):
+    def __init__(self, colour, averagingPeriod = 0, medianWindow = 0, debug = False):
         self.colour = colour
         self.lock = threading.Lock()
         self.averagingPeriod = averagingPeriod
         self.medianWindow = medianWindow
+        self.debug = debug
         self.values = []
         self.calibrate()
     
@@ -250,12 +255,20 @@ class TiltHydrometer:
                 csvFileReader = csv.reader(csvFile, skipinitialspace=True)
                 self.calibrationDataTime[type] = fileModificationTime
                 
+                lineNumber = 1
                 for row in csvFileReader:
-                    #Skip any comment rows
-                    if (row[0][:1] != "#"): 
+                    if (self.debug):
+                            print "TiltHydrometer (" + colour + "): File - " + filename  + ", Line " + str(lineNumber) + " processing [" + str(row) + "]"
+                    #Skip any comment rows and rows with no configuration data
+                    if ((len(row) != 2) or (row[0][:1] == "#")):
+                        print "WARNING: TiltHydrometer (" + colour + "): File - " + filename  + ", Line " + str(lineNumber) + " was ignored as does not contain valid configuration data [" + str(row) + "]"
+                    else: 
+                        if (self.debug):
+                            print "TiltHydrometer (" + colour + "): File - " + filename  + ", Line " + str(lineNumber) + " processed successfully"
                         originalValues.append(float(row[0]))
                         actualValues.append(float(row[1]))
-                
+                    
+                    lineNumber += 1
                 #Close file
                 csvFile.close()
         except IOError:
@@ -284,6 +297,7 @@ class TiltHydrometerManager:
     dev_id = 0
     averagingPeriod = 0
     medianWindow = 0
+    debug = False
     
     scanning = True
     #Dictionary to hold tiltHydrometers - index on colour
@@ -320,7 +334,7 @@ class TiltHydrometerManager:
     def storeValue(self, colour, temperature, gravity):
         tiltHydrometer = self.tiltHydrometers.get(colour)
         if (tiltHydrometer is None):
-            tiltHydrometer = TiltHydrometer(colour, self.averagingPeriod, self.medianWindow)
+            tiltHydrometer = TiltHydrometer(colour, self.averagingPeriod, self.medianWindow, self.debug)
             self.tiltHydrometers[colour] = tiltHydrometer
             
         
@@ -357,6 +371,9 @@ class TiltHydrometerManager:
                 #Resolve whether the received BLE event is for a Tilt Hydrometer by looking at the UUID.
                 name = self.tiltHydrometerName(beaconParts[1])
                 
+                if (self.debug):
+                        print name + " Tilt Device Found (UUID " + beaconParts[1] + "): " + str(beaconParts)
+                
                 #If the event is for a Tilt Hydrometer , process the data
                 if name is not None:
                     #Get the temperature and convert to C if needed.
@@ -369,7 +386,10 @@ class TiltHydrometerManager:
                     
                     #Store the retrieved values in the relevant Tilt Hydrometer object.
                     self.storeValue(name, temperature, gravity)
-
+                else:
+                    #Output what has been found.
+                    if (self.debug):
+                        print "UNKNOWN BLE Device Found: " + str(beaconParts)
     #Stop Scanning function
     def stop(self):
         self.scanning = False
@@ -391,6 +411,7 @@ class TiltHydrometerManager:
             self.dev_ID = config.getint("Manager","DeviceID")
             self.averagingPeriod = config.getint("Manager","AveragePeriodSeconds")
             self.medianWindow = config.getint("Manager","MedianWindowVals")
+            self.debug = config.getboolean("Manager","Debug")
             
 
         except Exception, e:
