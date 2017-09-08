@@ -30,9 +30,11 @@ jsonCols = ("\"cols\":[" +
             "{\"type\":\"number\",\"id\":\"FridgeTemp\",\"label\":\"Fridge temperature\"}," +
             "{\"type\":\"number\",\"id\":\"FridgeSet\",\"label\":\"Fridge setting\"}," +
             "{\"type\":\"string\",\"id\":\"FridgeAnn\",\"label\":\"Fridge Annotate\"}," +
-            "{\"type\":\"number\",\"id\":\"RoomTemp\",\"label\":\"Room temp.\"}," +
+            "{\"type\":\"number\",\"id\":\"Log1Temp\",\"label\":\"Log1 temp.\"}," +
+						"{\"type\":\"number\",\"id\":\"Log2Temp\",\"label\":\"Log2 temp.\"}," +
+						"{\"type\":\"number\",\"id\":\"Log3Temp\",\"label\":\"Log3 temp.\"}," +
             "{\"type\":\"number\",\"id\":\"State\",\"label\":\"State\"}," +
-			"{\"type\":\"number\",\"id\":\"RedTemp\",\"label\":\"Red Tilt temp.\"}," +
+            "{\"type\":\"number\",\"id\":\"RedTemp\",\"label\":\"Red Tilt temp.\"}," +
 			"{\"type\":\"number\",\"id\":\"RedSG\",\"label\":\"Red Tilt Gravity\"}," +
 			"{\"type\":\"number\",\"id\":\"GreenTemp\",\"label\":\"Green Tilt temp.\"}," +
 			"{\"type\":\"number\",\"id\":\"GreenSG\",\"label\":\"Green Tilt Gravity\"}," +
@@ -109,10 +111,21 @@ def addRow(jsonFileName, row):
 	else:
 		jsonFile.write("{\"v\":\"" + str(row['FridgeAnn']) + "\"},")
 
-	if row['RoomTemp'] is None:
+	if row['Log1Temp'] is None:
 		jsonFile.write("null,")
 	else:
-		jsonFile.write("{\"v\":" + str(row['RoomTemp']) + "},")
+		jsonFile.write("{\"v\":" + str(row['Log1Temp']) + "},")
+
+	if row['Log2Temp'] is None:
+		jsonFile.write("null,")
+	else:
+		jsonFile.write("{\"v\":" + str(row['Log2Temp']) + "},")
+
+	if row['Log3Temp'] is None:
+		jsonFile.write("null,")
+	else:
+		jsonFile.write("{\"v\":" + str(row['Log3Temp']) + "},")
+
 
 	if row['State'] is None:
 		jsonFile.write("null")
@@ -130,7 +143,6 @@ def addRow(jsonFileName, row):
 			jsonFile.write("null")
 		else:
 			jsonFile.write("{\"v\":" + str(row[colour + 'SG']) + "}")
-
 
 	# rewrite end of json file
 	jsonFile.write("]}]}")
