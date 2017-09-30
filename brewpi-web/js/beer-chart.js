@@ -91,6 +91,9 @@ var TILT_COLUMNS = 16;
 var legendStorageKeyPrefix = "legendLine_";
 var STATE_LINE_WIDTH = 15;
 
+//Maintains whether a series/column has any data in it.
+var seriesStatus = new Array(chartColors.length);
+
 /**
  * The states of the temp controller algorithm, and their presentation attributes.
  * @type {Array}
@@ -160,13 +163,22 @@ function stringToDate(dateString){
  */
 function toDygraphArray(jsonData) {
     "use strict";
+    var seriesStatusOffset = 0;
     var i, j, cols = jsonData.cols, rows = jsonData.rows, dataArray = [], labelsArray = [], annotationsArray = [], row,
         date, handlers = [],
         numberHandler = function (index, val) {
-            if (val) { row.push(parseFloat(val.v)); } else { row.push(null); }
+            if (val) { 
+                row.push(parseFloat(val.v)); 
+                seriesStatus[index-seriesStatusOffset] = true;
+            } else { row.push(null); }
         },
-        datetimeHandler = function (index, val) { date = stringToDate(val.v); row.push(date); },
+        datetimeHandler = function (index, val) { 
+            if (val) {
+                date = stringToDate(val.v); row.push(date); 
+            }
+        },
         annotationHandler = function (index, val) {
+            seriesStatusOffset++;
             if (!val) {
                 return;
             }
@@ -195,6 +207,7 @@ function toDygraphArray(jsonData) {
 
     for (i = 0; i < rows.length; i++){
         row = [];
+        seriesStatusOffset = 0;
         for (j = 0; j < Math.min(rows[i].c.length, handlers.length); j++) {
             handlers[j](j, rows[i].c[j]);
         }
@@ -544,8 +557,10 @@ function drawBeerChart(beerToDraw, div){
                     }
                     if ( localStorage.getItem( legendStorageKeyPrefix + key ) === "false" ) {
                         $row.find('.toggle').addClass("inactive");
+                        
+                        //Only update Visibility to hide lines previously hidden - by default all lines are visible.
+                        updateVisibility(key, $row.find('.toggle'));
                     }
-                    updateVisibility(key, $row.find('.toggle'));
                 }
                 if($(div + " .toggleAnnotations ").hasClass("inactive")){
                     $(this.beerChart).find('.dygraphDefaultAnnotation').css('visibility', 'hidden');
@@ -564,13 +579,8 @@ function drawBeerChart(beerToDraw, div){
 
 function isDataEmpty(chart, column, rowStart, rowEnd){
     "use strict";
-    // start with last element, because when a sensor is just connected it should show up
-    for (var row = rowEnd; row > rowStart; row--){
-        if(chart.getValue(row, column) !== null){
-            return false;
-        }
-    }
-    return true;
+    //Check the status array to see if there is any data in there
+    return seriesStatus[column] != true;
 }
 
 function toggleLine(el) {
