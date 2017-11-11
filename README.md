@@ -19,7 +19,7 @@ sudo apt-get install python-scipy python-numpy
 ## Setup & Testing
 
 1. Ensure you are updated to the latest version of Brewpi using the update script in the `brewpi-tools` folder.
-2. On the Raspberry Pi you need to install the bluez bnd python-bluez bluetooth modules to enable communication with the Tilt Hydrometer.
+2. On the Raspberry Pi you need to install the bluez and python-bluez bluetooth modules to enable communication with the Tilt Hydrometer.
 ```
 sudo apt-get install bluez python-bluez python-scipy python-numpy libcap2-bin
 ```
