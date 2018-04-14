@@ -39,8 +39,6 @@ from distutils.version import LooseVersion
 from serial import SerialException
 
 import TiltHydrometer
-import thread
-
 # load non standard packages, exit when they are not installed
 try:
     import serial
@@ -339,26 +337,16 @@ def resumeLogging():
 logMessage("Notification: Script started for beer '" + urllib.unquote(config['beerName']) + "'")
 
 logMessage("Connecting to controller...") 
-# bytes are read from nonblocking serial into this buffer and processed when the buffer contains a full line.
-ser = util.setupSerial(config, time_out=0)
 
-if not ser:
-    exit(1)
+# set up background serial processing, which will continuously read data from serial and put whole lines in a queue
+bg_ser = BackGroundSerial(config.get('port', 'auto'))
 
-# wait an optional startup delay after serial connect. Could be needed to skip a bootloader, default is no delay
-time.sleep(float(config.get('startupDelay', 0)))
-
-
-logMessage("Checking software version on controller... ")
-hwVersion = brewpiVersion.getVersionFromSerial(ser)
+hwVersion = brewpiVersion.getVersionFromSerial(bg_ser)
 if hwVersion is None:
     logMessage("Warning: Cannot receive version number from controller. " +
-               "This could be because your controller is not programmed or running a very old version of BrewPi." +
-               "This script will now exit.")
-    exit(1)
+               "Check your port setting in the Maintenance Panel or in settings/config.cfg.")
 else:
-    logMessage("Found " + hwVersion.toExtendedString() + \
-               " on port " + ser.name + "\n")
+    logMessage("Found " + hwVersion.toExtendedString())
     if LooseVersion( hwVersion.toString() ) < LooseVersion(compatibleHwVersion):
         logMessage("Warning: minimum BrewPi version compatible with this script is " +
                    compatibleHwVersion +
@@ -372,16 +360,6 @@ else:
         exit("\n ERROR: the newest version of BrewPi is not compatible with Arduino. \n" +
             "You can use our legacy branch with your Arduino, in which we only include the backwards compatible changes. \n" +
             "To change to the legacy branch, run: sudo ~/brewpi-tools/updater.py --ask , and choose the legacy branch.")
-
-
-bg_ser = None
-
-if ser is not None:
-    ser.flush()
-
-    # set up background serial processing, which will continuously read data from serial and put whole lines in a queue
-    bg_ser = BackGroundSerial(ser)
-    bg_ser.start()
     
 # create a listening socket to communicate with PHP
 is_windows = sys.platform.startswith('win')
@@ -593,6 +571,12 @@ while run:
                     continue
                 logMessage("Notification: Interval changed to " +
                            str(newInterval) + " seconds")
+        elif messageType == "portAddress":  # new port setting received
+            config = util.configSet(configFile, 'port', str(value))
+            logMessage("Port setting changed to: " + str(value))
+            bg_ser.stop()
+            bg_ser.port = str(value)
+            bg_ser.start()
         elif messageType == "startNewBrew":  # new beer name
             newName = value
             result = startNewBrew(newName)
@@ -644,10 +628,7 @@ while run:
         elif messageType == "programController" or messageType == "programArduino":
             if bg_ser is not None:
                 bg_ser.stop()
-            if ser is not None:
-                if ser.isOpen():
-                    ser.close()  # close serial port before programming
-                ser = None
+            
             try:
                 programParameters = json.loads(value)
                 hexFile = programParameters['fileName']
@@ -674,14 +655,19 @@ while run:
                 bg_ser.writeln("d{}")  # request installed devices
                 bg_ser.writeln("h{u:-1}")  # request available, but not installed devices
         elif messageType == "getDeviceList":
-            if deviceList['listState'] in ["dh", "hd"]:
-                response = dict(board=hwVersion.board,
-                                shield=hwVersion.shield,
-                                deviceList=deviceList,
-                                pinList=pinList.getPinList(hwVersion.board, hwVersion.shield))
-                conn.send(json.dumps(response))
+            if hwVersion is None:
+                hwVersion = brewpiVersion.getVersionFromSerial(bg_ser)
+            if hwVersion is None:
+                conn.send("Cannot communicate with BrewPi Spark")
             else:
-                conn.send("device-list-not-up-to-date")
+                if deviceList['listState'] in ["dh", "hd"]:
+                    response = dict(board=hwVersion.board,
+                                    shield=hwVersion.shield,
+                                    deviceList=deviceList,
+                                    pinList=pinList.getPinList(hwVersion.board, hwVersion.shield))
+                    conn.send(json.dumps(response))
+                else:
+                    conn.send("device-list-not-up-to-date")
         elif messageType == "applyDevice":
             try:
                 configStringJson = json.loads(value)  # load as JSON to check syntax
@@ -698,14 +684,19 @@ while run:
                 continue
             bg_ser.writeln("d" + json.dumps(configStringJson))
         elif messageType == "getVersion":
-            if hwVersion:
-                response = hwVersion.__dict__
-                # replace LooseVersion with string, because it is not JSON serializable
-                response['version'] = hwVersion.toString()
+            if hwVersion is None:
+                hwVersion = brewpiVersion.getVersionFromSerial(bg_ser)
+            if hwVersion is None:
+                conn.send("Cannot communicate with BrewPi Spark")
             else:
-                response = {}
-            response_str = json.dumps(response)
-            conn.send(response_str)
+                if hwVersion:
+                    response = hwVersion.__dict__
+                    # replace LooseVersion with string, because it is not JSON serializable
+                    response['version'] = hwVersion.toString()
+                else:
+                    response = {}
+                response_str = json.dumps(response)
+                conn.send(response_str)
         elif messageType == "resetController":
             logMessage("Resetting controller to factory defaults")
             bg_ser.writeln("E")
@@ -722,10 +713,13 @@ while run:
         # Do serial communication and update settings every SerialCheckInterval
         prevTimeOut = time.time()
 
-        if hwVersion is None:
-            continue  # do nothing with the serial port when the controller has not been recognized
-
         while True:
+            if not bg_ser.connected():
+                temperatures['Error'] = "Connection to BrewPi Spark interrupted."
+                break
+            else:
+                temperatures.pop('Error', None)
+
             line = bg_ser.read_line()
             message = bg_ser.read_message()
             if line is None and message is None:
@@ -784,7 +778,7 @@ while run:
                                             json.dumps(newRow['State']) + ';' +
                                             json.dumps(newRow['Log1Temp']) + ';' +
                                             json.dumps(newRow['Log2Temp']) + ';' +
-                                            json.dumps(newRow['Log3Temp']))
+                                            json.dumps(newRow['Log3Temp']) + ';')
                             
                                 # Write out Tilt Hydrometer Temp and SG Values
                                 for colour in TiltHydrometer.TILTHYDROMETER_COLOURS:
@@ -836,11 +830,7 @@ while run:
                     logMessage("Line received was: " + line)
 
             if message is not None:
-                try:
-                    expandedMessage = expandLogMessage.expandLogMessage(message)
-                    logMessage("Controller debug message: " + expandedMessage)
-                except Exception, e:  # catch all exceptions, because out of date file could cause errors
-                    logMessage("Error while expanding log message '" + message + "'" + str(e))
+                logMessage("Controller debug message: " + message)
 
         if(time.time() - prevSettingsUpdate) > 60:
             # Request Settings from controller to stay up to date
@@ -852,11 +842,6 @@ while run:
         if (time.time() - prevDataTime) >= 5:
             bg_ser.writeln("t")  # request new temperatures from controller
             prevDataTime = time.time()
-            
-        if (time.time() - prevSerialReceive > 60):
-            #something is wrong: controller is not responding to data requests
-            logMessage("Error: controller is not responding anymore. Exiting script.")
-            sys.exit()
         
         # Check for update from temperature profile
         if cs['mode'] == 'p':
